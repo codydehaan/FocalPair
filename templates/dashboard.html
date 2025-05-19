@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Welcome {{ current_user.email }}</h2>
+
+  {% if current_user.role == 'photographer' %}
+    <p><a class="btn btn-primary" href="{{ url_for('edit_profile') }}">
+      Edit Your Profile
+    </a></p>
+
+
+  {% elif current_user.role == 'client' %}
+    <p><a class="btn btn-primary" href="{{ url_for('discover') }}">
+      Start Swiping
+    </a></p>
+
+    <p><a class= "btn btn-primary" href="{{ url_for('liked_profiles') }}">
+      View Liked Photographers
+    </a></p>
+  {% endif %}
+{% endblock %}

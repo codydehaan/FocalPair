@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}All Done!{% endblock %}
+{% block content %}
+  <div class="text-center my-5">
+    <h2>No more photographers to show</h2>
+    <p>You’ve swiped through all available profiles. Check back later for new photographers!</p>
+    <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+  </div>
+{% endblock %}

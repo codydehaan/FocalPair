@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Find a Photographer</h2>
+
+<form method="get">
+    <label for="style">Style:</label>
+    <select name="style" id="style">
+        <option value="">All</option>
+        {% for s in styles %}
+        <option value="{{ s }}" {% if selected_style == s %}selected{% endif %}>{{ s.capitalize() }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="mood">Mood:</label>
+    <select name="mood" id="mood">
+        <option value="">All</option>
+        {% for m in moods %}
+        <option value="{{ m }}" {% if selected_mood == m %}selected{% endif %}>{{ m.capitalize() }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="niche">Niche:</label>
+    <select name="niche" id="niche">
+        <option value="">All</option>
+        {% for n in niche %}
+        <option value="{{ n }}" {% if selected_niche == n %}selected{% endif %}>{{ n.capitalize() }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Filter</button>
+</form>
+
+<hr>
+
+{% if photographers %}
+    {% for photographer in photographers %}
+        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+            <strong>Email:</strong> {{ photographer.user.email }}<br>
+            <strong>Bio:</strong> {{ photographer.bio or "No bio yet." }}<br>
+            <strong>Style:</strong> {{ photographer.style.capitalize() }}<br>
+            <strong>Mood:</strong> {{ photographer.mood.capitalize() }}<br>
+            <strong>Niche:</strong> {{ photographer.niche.capitalize() }}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No photographers match your criteria.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,24 @@
+<div class="profile-card">
+  <h3>{{ profile.user.email }}</h3>
+  <p><strong>Style:</strong> {{ profile.style }}</p>
+  <p><strong>Mood:</strong> {{ profile.mood }}</p>
+  <p><strong>Niche:</strong> {{ profile.niche }}</p>
+  <p><strong>Bio:</strong> {{ profile.bio }}</p>
+
+  {% if profile.user.portfolio_images %}
+    <div class="portfolio-gallery d-flex flex-wrap">
+      {% for img in profile.user.portfolio_images %}
+        <img src="{{ url_for('static', filename='uploads/' ~ img.image_path) }}"
+             alt="Portfolio image"
+             style="width: 80px; height:80px; object-fit:cover; margin:4px; border-radius:4px;">
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form action="{{ url_for('like_photographer', photographer_id=profile.user_id) }}" method="POST">
+    <button type="submit" class="btn btn-success">❤️ Like</button>
+  </form>
+  <form action="{{ url_for('pass_photographer', photographer_id=profile.user_id) }}" method="POST">
+    <button type="submit" class="btn btn-danger">❌ Pass</button>
+  </form>
+</div>

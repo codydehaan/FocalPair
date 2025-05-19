@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Create Your Photographer Profile</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div>
+      {{ form.bio.label }}<br>
+      {{ form.bio() }}<br>
+      {% for err in form.bio.errors %}
+        <small style="color:red">{{ err }}</small><br>
+      {% endfor %}
+    </div>
+
+    <div>
+      {{ form.style.label }}<br>
+      {{ form.style() }}<br>
+      {% for err in form.style.errors %}
+        <small style="color:red">{{ err }}</small><br>
+      {% endfor %}
+    </div>
+
+    <div>
+      {{ form.mood.label }}<br>
+      {{ form.mood() }}<br>
+      {% for err in form.mood.errors %}
+        <small style="color:red">{{ err }}</small><br>
+      {% endfor %}
+    </div>
+
+    <div>
+      {{ form.niche.label }}<br>
+      {{ form.niche() }}<br>
+      {% for err in form.niche.errors %}
+        <small style="color:red">{{ err }}</small><br>
+      {% endfor %}
+    </div>
+
+    <div>
+      {{ form.submit() }}
+    </div>
+  </form>
+{% endblock %}

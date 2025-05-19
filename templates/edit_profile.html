@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
+{% block content %}
+  <h2>Edit Your Profile</h2>
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.bio.label(class="form-label") }}
+      {{ form.bio(class="form-control") }}
+      {% for err in form.bio.errors %}
+        <div class="text-danger">{{ err }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.style.label(class="form-label") }}
+      {{ form.style(class="form-select") }}
+      {% for err in form.style.errors %}
+        <div class="text-danger">{{ err }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.mood.label(class="form-label") }}
+      {{ form.mood(class="form-select") }}
+      {% for err in form.mood.errors %}
+        <div class="text-danger">{{ err }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.niche.label(class="form-label") }}
+      {{ form.niche(class="form-control") }}
+      {% for err in form.niche.errors %}
+        <div class="text-danger">{{ err }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.portfolio.label(class="form-label") }}
+      {{ form.portfolio(class="form-control") }}
+      {% for err in form.portfolio.errors %}
+        <div class="text-danger">{{ err }}</div>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+  </form>
+
+  {% if existing_images %}
+    <hr>
+    <h4>Your Portfolio</h4>
+    <div class="d-flex flex-wrap">
+      {% for img in existing_images %}
+        <div class="me-2 mb-2">
+          <img src="{{ url_for('static', filename='uploads/' ~ img.filename) }}"
+               class="img-thumbnail" style="width:100px;height:100px;object-fit:cover;">
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

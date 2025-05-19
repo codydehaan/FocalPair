@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Your Liked Photographers{% endblock %}
+{% block content %}
+  <h2>Your Liked Photographers</h2>
+
+  {% if liked_profiles %}
+    <div class="row">
+      {% for profile, ts in liked_profiles %}
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ profile.user.email }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">
+                Liked on {{ ts.strftime("%b %d, %Y at %H:%M") }}
+              </h6>
+              <p class="card-text"><strong>Style:</strong> {{ profile.style }}</p>
+              <p class="card-text"><strong>Mood:</strong> {{ profile.mood }}</p>
+              <p class="card-text"><strong>Niche:</strong> {{ profile.niche }}</p>
+              <p class="card-text">{{ profile.bio }}</p>
+
+              {% if profile.user.portfolio_images %}
+                <div class="d-flex flex-wrap">
+                  {% for img in profile.user.portfolio_images %}
+                    <img
+                      src="{{ url_for('static', filename='uploads/' ~ img.image_path) }}"
+                      class="img-thumbnail m-1"
+                      style="width:60px; height:60px; object-fit:cover;"
+                    >
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>You haven’t liked any photographers yet. <a href="{{ url_for('discover') }}">Start swiping</a>.</p>
+  {% endif %}
+{% endblock %}
