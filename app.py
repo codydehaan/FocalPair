@@ -20,7 +20,7 @@ from sqlalchemy.sql.expression import func
 
 app = Flask(__name__)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-app.config["SECRET_KEY"] = "099dbc30d8d37bf441e87c3ec95a628c"
+app.config["SECRET_KEY"] = ""
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"sqlite:///{os.path.join(BASE_DIR, 'instance', 'app.db')}"
 )
