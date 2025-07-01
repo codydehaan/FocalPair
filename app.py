@@ -38,6 +38,8 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
 def allowed_file(filename):
+    """Return True if the file with the given filename has an extension that is
+    one of the ones in ALLOWED_EXTENSIONS."""
     ext = filename.rsplit(".", 1)[1].lower()
     return "." in filename and ext in ALLOWED_EXTENSIONS
 
@@ -49,6 +51,7 @@ class User(db.Model, UserMixin):
 
 
 class PhotographerProfile(db.Model):
+    """A photographer's profile."""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), unique=True)
     bio = db.Column(db.Text, nullable=True)
@@ -60,6 +63,7 @@ class PhotographerProfile(db.Model):
 
 
 class PortfolioImage(db.Model):
+    """An image uploaded by a photographer."""
     id = db.Column(db.Integer, primary_key=True)
     photographer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     image_path = db.Column(db.String(200), nullable=False)
@@ -69,11 +73,15 @@ class PortfolioImage(db.Model):
 
 
 @login_manager.user_loader
+"""
+Load a User object from the user ID stored in the session."""
 def load_user(user_id):
+    """Return a User object given a user_id, or None if no user is found."""
     return User.query.get(int(user_id))
 
 
 class RegisterForm(FlaskForm):
+    """A form for registering a new user."""
     email = StringField("Email", validators=[InputRequired(), Email()])
     password = PasswordField("Password", validators=[InputRequired(), Length(min=4)])
     confirm = PasswordField("Confirm Password", validators=[EqualTo("password")])
@@ -84,12 +92,14 @@ class RegisterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
+    """A form for logging in a user."""
     email = StringField("Email", validators=[InputRequired(), Email()])
     password = PasswordField("Password", validators=[InputRequired()])
     submit = SubmitField("Login")
 
 
 class Like(db.Model):
+    """A like from a client to a photographer."""
     id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     photographer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -102,6 +112,7 @@ class Like(db.Model):
 
 
 class ProfileForm(FlaskForm):
+    """A form for editing a photographer's profile."""
     bio = StringField("Short Bio", validators=[Length(max=500)])
     style = SelectField(
         "Style",
@@ -143,12 +154,27 @@ class ProfileForm(FlaskForm):
 
 
 @app.route("/")
+"""Show the homepage."""
 def home():
+    """Show the homepage."""
     return render_template("home.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
+"""Handle user registration requests."""
 def register():
+    """
+    Handle user registration requests.
+
+    This function displays a registration form and processes form submissions
+    to create a new user. If the registration is successful, the user will be
+    redirected to the login page. If the email is already registered, a warning
+    message is displayed, and the user is redirected to the login page.
+
+    Returns:
+        A rendered template for the registration page, or a redirect to the login page.
+    """
+
     form = RegisterForm()
     if form.validate_on_submit():
         if User.query.filter_by(email=form.email.data).first():
@@ -168,6 +194,17 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """
+    Handle user login requests.
+
+    This function displays a login form and processes form submissions to
+    log in a user. If the login is successful, the user will be redirected
+    to the dashboard page. If the email or password is invalid, a warning
+    message is displayed, and the user is redirected to the login page.
+
+    Returns:
+        A rendered template for the login page, or a redirect to the dashboard page.
+    """
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -182,6 +219,17 @@ def login():
 @app.route("/dashboard")
 @login_required
 def dashboard():
+    """
+    Display the dashboard for the logged-in user.
+
+    If the user is a photographer without a profile, redirect them to create a profile.
+    Otherwise, render the dashboard page.
+
+    Returns:
+        A redirect to the create profile page if the user is a photographer without a profile.
+        A rendered template for the dashboard page for all other users.
+    """
+
     if current_user.role == "photographer" and not current_user.profile:
         return redirect(url_for("create_profile"))
     return render_template("dashboard.html")
@@ -190,6 +238,20 @@ def dashboard():
 @app.route("/create_profile", methods=["GET", "POST"])
 @login_required
 def create_profile():
+    """
+    Handle requests to create a photographer profile.
+
+    This function allows photographers to create a profile by filling out a form with
+    their bio, style, mood, and niche. Photographers can also upload portfolio images.
+    If the form is submitted and validated, the profile and images are saved to the database.
+    Only photographers without an existing profile can access this page.
+
+    Returns:
+        A redirect to the dashboard if the user is not a photographer or already has a profile.
+        A redirect to the dashboard with a success message upon successful profile creation.
+        A rendered template for the create profile page with the form otherwise.
+    """
+
     if current_user.role != "photographer":
         flash("Only photographers can create profiles.", "warning")
         return redirect(url_for("dashboard"))
@@ -231,6 +293,16 @@ def create_profile():
 @app.route("/photographers", methods=["GET", "POST"])
 @login_required
 def photographers():
+    """
+    Handle requests to view photographers.
+
+    This function displays a page with a list of all photographers in the database.
+    Clients can filter the list by style, mood, and niche using the form.
+    The list of photographers is paginated for easier viewing.
+
+    Returns:
+        A rendered template for the photographers page with the list of photographers.
+    """
     if current_user.role != "client":
         flash("Only clients can view photographers.", "warning")
         return redirect(url_for("dashboard"))
@@ -282,6 +354,17 @@ def photographers():
 @login_required
 def edit_profile():
     # Only photographers can edit their profile
+    """
+    Handle requests to edit a photographer's profile.
+
+    This function displays a page with a pre-populated form for the photographer to edit their profile.
+    The form includes fields for bio, style, mood, and niche, as well as a file upload for adding new
+    portfolio images.
+
+    Returns:
+        A rendered template for the edit profile page with the form pre-populated.
+    """
+
     if current_user.role != "photographer":
         flash("Only photographers can edit profiles.", "warning")
         return redirect(url_for("dashboard"))
@@ -326,6 +409,15 @@ def edit_profile():
 @app.route("/discover")
 @login_required
 def discover():
+    """Handle requests to browse photographers.
+
+    This function displays a single photographer's profile, selected at random from all
+    available profiles that the client has not yet seen. If the client has seen all
+    available profiles, they're shown a "no more profiles" message.
+
+    Returns:
+        A rendered template for a single photographer's profile.
+    """
     if current_user.role != "client":
         flash("Only clients can browse photographers.", "warning")
         return redirect(url_for("dashboard"))
@@ -350,6 +442,14 @@ def discover():
 @app.route("/like/<int:photographer_id>", methods=["POST"])
 @login_required
 def like_photographer(photographer_id):
+    """Handle a client's request to like a photographer.
+
+    This function is reached when a client submits a "like" vote for a photographer's profile.
+    It creates a new Like record in the database and redirects the client back to the discover page.
+
+    Returns:
+        A redirect to the discover page.
+    """
     if current_user.role != "client":
         flash("Only clients can like photographers.", "warning")
         return redirect(url_for("dashboard"))
@@ -363,12 +463,30 @@ def like_photographer(photographer_id):
 @app.route("/pass/<int:photographer_id>", methods=["POST"])
 @login_required
 def pass_photographer(photographer_id):
+    """Handle a client's request to pass a photographer.
+
+    This function is reached when a client submits a "pass" vote for a photographer's profile.
+    It redirects the client back to the discover page, without creating a new Like record.
+
+    Returns:
+        A redirect to the discover page.
+    """
     return redirect(url_for("discover"))
 
 
 @app.route("/liked")
 @login_required
 def liked_profiles():
+    """Handle a client's request to view their liked profiles.
+
+    This function is reached when a client requests to view the profiles they have previously liked.
+    It fetches the list of Like records for the current user, and for each one, fetches the corresponding
+    PhotographerProfile record. It then passes a list of (profile, timestamp) tuples to the template.
+
+    Returns:
+        A rendered template for the liked profiles page.
+    """
+    
     if current_user.role != "client":
         flash("Only clients can view liked profiles.", "warning")
         return redirect(url_for("dashboard"))
@@ -390,6 +508,14 @@ def liked_profiles():
 @app.route("/logout")
 @login_required
 def logout():
+    """Handle a request to log out the user.
+
+    This function is reached when a user submits a GET request to /logout.
+    It logs the user out using Flask-Login and redirects them to the login page with a success message.
+
+    Returns:
+        A redirect to the login page.
+    """
     logout_user()
     flash("Logged out.", "info")
     return redirect(url_for("login"))
