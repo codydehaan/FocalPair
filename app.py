@@ -73,8 +73,6 @@ class PortfolioImage(db.Model):
 
 
 @login_manager.user_loader
-"""
-Load a User object from the user ID stored in the session."""
 def load_user(user_id):
     """Return a User object given a user_id, or None if no user is found."""
     return User.query.get(int(user_id))
@@ -154,14 +152,12 @@ class ProfileForm(FlaskForm):
 
 
 @app.route("/")
-"""Show the homepage."""
 def home():
     """Show the homepage."""
     return render_template("home.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
-"""Handle user registration requests."""
 def register():
     """
     Handle user registration requests.
@@ -479,9 +475,12 @@ def pass_photographer(photographer_id):
 def liked_profiles():
     """Handle a client's request to view their liked profiles.
 
-    This function is reached when a client requests to view the profiles they have previously liked.
-    It fetches the list of Like records for the current user, and for each one, fetches the corresponding
-    PhotographerProfile record. It then passes a list of (profile, timestamp) tuples to the template.
+    This function is reached when a client requests to view
+    the profiles they have previously liked.
+    It fetches the list of Like records for the current user,
+    and for each one, fetches the corresponding
+    PhotographerProfile record. It then passes a list
+    of (profile, timestamp) tuples to the template.
 
     Returns:
         A rendered template for the liked profiles page.
@@ -511,7 +510,8 @@ def logout():
     """Handle a request to log out the user.
 
     This function is reached when a user submits a GET request to /logout.
-    It logs the user out using Flask-Login and redirects them to the login page with a success message.
+    It logs the user out using Flask-Login and redirects them to the 
+    login page with a success message.
 
     Returns:
         A redirect to the login page.
